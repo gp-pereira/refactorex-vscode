@@ -1,63 +1,98 @@
-import * as path from "path";
+import { LanguageClient } from "vscode-languageclient/node";
 import { workspace, ExtensionContext } from "vscode";
-
-import {
-	LanguageClient,
-	LanguageClientOptions,
-	ServerOptions,
-	TransportKind,
-} from "vscode-languageclient/node";
+import { ChildProcess, exec } from "child_process";
+import * as path from "path";
+import * as net from "net";
 
 let client: LanguageClient;
+let server: ChildProcess;
 
 export function activate(context: ExtensionContext) {
-	// The server is implemented in node
-	const serverModule = context.asAbsolutePath(
-		path.join("server", "out", "server.js")
-	);
-
-	console.log(serverModule);
-
-	// If the extension is launched in debug mode then the debug server options are used
-	// Otherwise the run options are used
-	const serverOptions: ServerOptions = {
-		run: {
-			command: "./_refactorex/bin/start",
-			transport: {
-				kind: TransportKind.socket,
-				port: 9000,
-			},
-		},
-		debug: {
-			command: "echo",
-		},
-	};
-
-	// Options to control the language client
-	const clientOptions: LanguageClientOptions = {
-		// Register the server for plain text documents
-		documentSelector: [{ scheme: "file", language: "elixir" }],
-		synchronize: {
-			// Notify the server about file changes to '.clientrc files contained in the workspace
-			fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),
-		},
-	};
-
-	// Create the language client and start the client.
 	client = new LanguageClient(
 		"refactorex",
 		"Refactorex",
-		serverOptions,
-		clientOptions
+		async () => {
+			const relativePath = path.join("refactorex", "bin", "start");
+			const command = context.asAbsolutePath(relativePath);
+
+			const port = await findAvailablePort();
+
+			server = exec(`MIX_ENV=prod ${command} --port ${port}`, (error) => {
+				if (error) client.info(`Server not started: ${error}`);
+			});
+
+			// giving the server some time to compile and start
+			await new Promise((r) => setTimeout(r, 15000));
+
+			client.info(`Server started on port ${port}`);
+
+			const socket = await connect(port);
+
+			return { writer: socket, reader: socket };
+		},
+		{
+			documentSelector: [{ scheme: "file", language: "elixir" }],
+			synchronize: {
+				fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),
+			},
+		}
 	);
 
-	// Start the client. This will also launch the server
 	client.start();
+	client.info("Client started and waiting server");
 }
 
 export function deactivate(): Thenable<void> | undefined {
-	if (!client) {
-		return undefined;
-	}
+	if (server) server.kill("SIGTERM");
+
+	if (!client) return;
+
 	return client.stop();
+}
+
+function findAvailablePort(): Promise<number> {
+	return new Promise((resolve, reject) => {
+		const server = net.createServer();
+
+		server.listen(0, () => {
+			const { port } = server.address() as net.AddressInfo;
+
+			if (port) {
+				server.close((error) => (error ? reject(error) : resolve(port)));
+			} else {
+				reject(new Error("No port available for the server"));
+			}
+		});
+
+		server.on("error", (error) => reject(error));
+	});
+}
+
+function connect(
+	port: number,
+	maxRetries = 5,
+	retryDelay = 1000
+): Promise<net.Socket> {
+	return new Promise((resolve, reject) => {
+		let attempts = 0;
+
+		const doConnect = () => {
+			const socket = new net.Socket();
+
+			socket.connect({ host: "127.0.0.1", port }, () => resolve(socket));
+
+			socket.on("error", () => {
+				if (attempts >= maxRetries) {
+					reject(new Error("Client could not connect to the server."));
+				} else {
+					attempts++;
+
+					const exponentialBackoff = retryDelay * Math.pow(2, attempts - 1);
+					setTimeout(doConnect, exponentialBackoff);
+				}
+			});
+		};
+
+		doConnect();
+	});
 }
