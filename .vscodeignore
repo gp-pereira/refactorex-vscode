@@ -1,0 +1,5 @@
+**/*.ts
+**/tsconfig.json
+
+!refactorex/+(bin|lib|deps|mix.exs|mix.lock)
+refactorex/**
