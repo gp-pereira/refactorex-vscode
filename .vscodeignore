@@ -3,3 +3,5 @@
 
 !refactorex/+(bin|lib|deps|mix.exs|mix.lock)
 refactorex/**
+
+assets/examples/**
