@@ -1,5 +1,9 @@
-Inspired on the [catalog of Elixir refactorings](https://github.com/lucasvegi/Elixir-Refactorings), this 
-extension uses the Refactorex language server to enhance VS Code with code actions to quickly refactor Elixir.
+# Refactorex for VS Code
+
+Uses the [Refactorex](https://github.com/gp-pereira/refactorex) language server to 
+enhance VS Code with code actions to quickly refactor Elixir. 
+
+![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/readme.gif?raw=true)
 
 ## Available refactorings
 * __Function__
