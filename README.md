@@ -3,7 +3,7 @@
 Uses the [Refactorex](https://github.com/gp-pereira/refactorex) language server to 
 enhance VS Code with code actions to quickly refactor Elixir. 
 
-![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/readme.gif?raw=true)
+![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/readme.gif?raw=true)
 
 ## Available refactorings
 * __Function__
