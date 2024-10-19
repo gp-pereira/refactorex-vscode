@@ -6,28 +6,41 @@ enhance VS Code with code actions to quickly refactor Elixir.
 ![Example](https://github.com/gp-pereira/refactorex-vscode/blob/main/assets/examples/readme.gif?raw=true)
 
 ## Available refactorings
-* __Function__
-  * [x] [Expand anonymous function](#function-expand-anonymous-function) 
-  * [x] [Extract anonymous function](#function-extract-anonymous-function) 
-  * [x] [Extract function](#function-extract-function) 
-  * [ ] Inline function
-  * [ ] Rename function
-  * [x] [Underscore unused args](#function-underscore-unused-args) 
-  * [x] [Use keyword syntax](#function-use-keyword-syntax) 
-  * [x] [Use regular syntax](#function-use-regular-syntax) 
 
-* __Pipeline__
-  * [x] [Pipe first arg](#pipeline-pipe-first-arg) 
-  * [x] [Remove pipe](#pipeline-remove-pipe) 
-
-* __Variable__
-  * [x] [Extract constant](#variable-extract-constant)
-  * [ ] Extract variable
-  * [ ] Inline constant
-  * [ ] Inline variable
-  * [ ] Rename constant
-  * [ ] Rename variable
-  * [ ] Underscore long number
+| Scope | Refactoring | Target | Published? |
+| :-: | - | :-: | :-: |
+| `alias` | Sort aliases | selection | |
+| `alias` | Merge aliases | selection | |
+| `alias` | Expand aliases | selection | |
+| | | |
+| `constant` | [Extract constant](#variable-extract-constant) | selection | ✔ |
+| `constant` | Inline constant | selection | ✔ |
+| `constant` | Rename constant | selection | ✔ |
+| | | |
+| `function` | [Expand anonymous function](#function-expand-anonymous-function)  | selection | ✔ |
+| `function` | [Extract anonymous function](#function-extract-anonymous-function)  | selection | ✔ |
+| `function` | [Extract function](#function-extract-function)  | selection | ✔ |
+| `function` | Inline function | selection |
+| `function` | Rename function | selection |
+| `function` | [Underscore unused args](#function-underscore-unused-args)  | line | ✔ |
+| `function` | [Use keyword syntax](#function-use-keyword-syntax)  | line | ✔ |
+| `function` | [Use regular syntax](#function-use-regular-syntax)  | line | ✔ |
+| | | |
+| `guard` | Extract guard | selection | |
+| `guard` | Inline guard | selection | |
+| `guard` | Rename guard | selection | |
+| | | |
+| `if else` | Use keyword syntax | line | ✔ |
+| `if else` | Use regular syntax | line | ✔ |
+| | | |
+| `pipeline` | Introduce IO.inspect | line | ✔ |
+| `pipeline` | [Introduce pipe](#pipeline-pipe-first-arg) | line |  ✔ |
+| `pipeline` | Remove IO.inspect | line | ✔ |
+| `pipeline` | [Remove pipe](#pipeline-remove-pipe) | line | ✔ |
+| | | |
+| `variable` | Extract variable | selection |
+| `variable` | Inline variable | selection |
+| `variable` | Rename variable | selection |
 
 ## How to use each refactoring
 
